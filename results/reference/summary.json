@@ -1,0 +1,106 @@
+{
+  "annual": {
+    "battery_charge_kwh": 766558.471314043,
+    "battery_discharge_kwh": 689902.6241826386,
+    "biogas_generated_kwh": 1581895.0349999927,
+    "biogas_operational_emissions_kg": 79094.75174999965,
+    "curtailed_kwh": 0.0,
+    "grid_emissions_kg": 51053.68567546086,
+    "grid_export_kwh": 355122.53202166257,
+    "grid_import_kwh": 126370.50909767539,
+    "load_kwh": 3284999.9999999995,
+    "pv_generated_kwh": 2008512.8350552982,
+    "pv_used_kwh": 2008512.8350552982,
+    "renewable_fraction": 0.9615310474588494,
+    "storage_losses_kwh": 76655.84713140444,
+    "unserved_kwh": 1e-07
+  },
+  "assumptions": {
+    "analysis_years": 25,
+    "battery_capex_aed_per_kwh": 900.0,
+    "battery_degradation_aed_per_kwh": 0.035,
+    "battery_energy_max_kwh": 7500.0,
+    "battery_fixed_om_fraction": 0.02,
+    "battery_lifetime_years": 12,
+    "battery_max_soc_fraction": 0.95,
+    "battery_min_soc_fraction": 0.1,
+    "battery_power_capex_aed_per_kw": 350.0,
+    "battery_power_max_kw": 2000.0,
+    "battery_round_trip_efficiency": 0.9,
+    "biogas_capacity_max_kw": 750.0,
+    "biogas_capex_aed_per_kw": 14000.0,
+    "biogas_electrical_efficiency": 0.35,
+    "biogas_fixed_om_fraction": 0.055,
+    "biogas_lifetime_years": 20,
+    "biogas_operational_emissions_kg_per_kwh": 0.05,
+    "biogas_variable_cost_aed_per_kwh": 0.045,
+    "daily_load_kwh": 9000.0,
+    "discount_rate": 0.07,
+    "export_tariff_aed_per_kwh": 0.05,
+    "feedstock_tonnes_per_day": 34.5,
+    "grid_emissions_kg_per_kwh": 0.404,
+    "grid_export_limit_kw": 600.0,
+    "grid_import_limit_kw": 1500.0,
+    "grid_tariff_aed_per_kwh": 0.44,
+    "location": "Dubai, UAE \u2014 illustrative",
+    "methane_energy_kwh_per_nm3": 9.97,
+    "methane_fraction": 0.6,
+    "pv_capacity_max_kw": 3000.0,
+    "pv_capex_aed_per_kw": 2500.0,
+    "pv_degradation_fraction": 0.0045,
+    "pv_fixed_om_fraction": 0.015,
+    "pv_lifetime_years": 25,
+    "specific_biogas_yield_nm3_per_tonne": 60.0,
+    "value_of_lost_load_aed_per_kwh": 20.0
+  },
+  "capacities": {
+    "battery_kw": 456.5110117007185,
+    "battery_kwh": 2735.5073690710446,
+    "biogas_kw": 182.41619753235722,
+    "pv_kw": 924.3283597945551
+  },
+  "evidence_scope": "illustrative feasibility benchmark using representative-day optimisation",
+  "financial": {
+    "annual_emissions_avoided_kg": 1196991.5625745396,
+    "annual_operating_cost_aed": 360736.26114068076,
+    "baseline_grid_cost_aed": 1445399.9999999998,
+    "baseline_lcoe_aed_per_kwh": 0.44,
+    "battery_capex_aed": 2621735.4862591913,
+    "biogas_capex_aed": 2553826.765453001,
+    "discounted_payback_years": 9.957174155976954,
+    "emissions_reduction_fraction": 0.901933151419247,
+    "first_year_saving_aed": 1084663.7388593191,
+    "initial_capex_aed": 7486383.151198581,
+    "irr": 0.11932698252921725,
+    "lcoe_aed_per_kwh": 0.3492814934146466,
+    "npv_aed": 3083864.9662614726,
+    "pv_capex_aed": 2310820.8994863876
+  },
+  "legacy_concept": {
+    "load_kwh_per_day": 9000.0,
+    "source_files": [
+      "Solar for my house.pptx",
+      "solar feasibility updated 2015.xls",
+      "Solar biogas hybird system.pptx",
+      "Solar and Biogas cost.pptx"
+    ],
+    "technologies": [
+      "solar PV",
+      "battery",
+      "camel-manure anaerobic digestion and biogas generation",
+      "grid"
+    ]
+  },
+  "not_engineering_or_investment_advice": true,
+  "resilience": {
+    "outage_load_kwh_weighted": 3300.3578151161755,
+    "outage_load_served_fraction": 0.9999999999697002,
+    "outage_unserved_kwh_weighted": 1e-07,
+    "representative_outage_hours": 6
+  },
+  "solver": {
+    "method": "SciPy HiGHS linear programming",
+    "representative_hours": 312,
+    "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+  }
+}
