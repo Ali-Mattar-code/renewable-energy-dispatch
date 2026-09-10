@@ -5,6 +5,7 @@ import numpy as np
 from hybrid_dispatch.config import ProjectConfig, TechnologySet
 from hybrid_dispatch.optimizer import optimise_system
 from hybrid_dispatch.profiles import build_representative_year, with_resilience_event
+from hybrid_dispatch.scenarios import resilience_envelope
 
 
 def test_power_balance_and_biogas_resource() -> None:
@@ -55,6 +56,23 @@ def test_resilient_design_serves_outage() -> None:
     outage = (result.dispatch["stress_case"] == 1) & (result.dispatch["grid_available"] == 0)
     assert result.dispatch.loc[outage, "unserved_kw"].sum() < 1e-5
     assert result.capacities.battery_kwh > 0
+
+
+def test_fixed_design_resilience_envelope_is_bounded_and_complete() -> None:
+    config = ProjectConfig()
+    design_profile = with_resilience_event(build_representative_year(config))
+    design = optimise_system(design_profile, config, require_resilience=True)
+    envelope = resilience_envelope(
+        design.capacities,
+        config,
+        months=(8,),
+        start_hours=(12, 18),
+        durations=(2, 6),
+    )
+    assert len(envelope) == 4
+    assert set(envelope["duration_hours"]) == {2, 6}
+    assert envelope["served_fraction"].between(0.0, 1.0).all()
+    assert (envelope["unserved_energy_kwh"] >= 0.0).all()
 
 
 def test_renewable_fraction_reconciles_with_grid_supply() -> None:

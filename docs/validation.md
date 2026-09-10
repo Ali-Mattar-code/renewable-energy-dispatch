@@ -10,6 +10,7 @@ The test suite verifies:
 - annual biogas generation cannot exceed feedstock energy;
 - disabled technologies receive zero capacity;
 - the resilient design serves the modelled outage;
+- outage-window inputs are bounded and the fixed-design envelope reports complete, physically bounded results;
 - component CAPEX reconciles to total CAPEX;
 - financial outputs are finite and emissions reduction remains bounded.
 
@@ -22,6 +23,8 @@ SciPy’s HiGHS linear-programming interface solves the joint capacity and dispa
 ## Interpretation tests
 
 The technology comparison is deliberately retained. Under the flat tariff and without an outage requirement, the least-cost full-hybrid solution may select zero battery capacity. When the six-hour evening resilience requirement is activated, storage becomes part of the optimal design. This confirms that the battery is selected by a stated system need rather than forced into the output.
+
+The post-design outage envelope then searches for counterexamples rather than assuming the design event generalises. Its ten-hour August evening case exposes a real service shortfall, which is retained in the committed results instead of being hidden by the successful six-hour design case.
 
 ## Remaining validation before real use
 

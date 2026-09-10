@@ -29,6 +29,7 @@ The resilient case co-optimises 312 representative hours, including one six-hour
 | Discounted payback | **10.0 years** |
 | Operational emissions reduction | **90.2%** |
 | Modelled outage load served | **~100%** |
+| Fixed-design outage envelope | **35 / 36 cases fully served; 89.4% worst-case coverage** |
 
 These figures are outputs of [`configs/reference.json`](configs/reference.json), not universal performance claims. Machine-readable evidence is committed under [`results/reference`](results/reference).
 
@@ -73,6 +74,14 @@ The project does not assume that “more technology” is automatically better. 
 ![Scenario comparison](results/reference/figures/scenario_comparison.png)
 
 Under a flat tariff, the unconstrained least-cost case can reject storage. The resilient case adds battery capacity only because the six-hour evening outage creates a measurable service requirement. This is a feature of the feasibility logic, not a missing result.
+
+## Resilience envelope
+
+A design that passes one outage can still fail at another time of day or season. The reference pipeline therefore freezes the selected capacities and redispatches them across **36 counterfactual outages**: February, August and November; four start times; and durations of 2, 6 and 10 hours.
+
+![Fixed-design resilience envelope](results/reference/figures/resilience_envelope.png)
+
+The fixed design fully serves 35 of 36 cases. The binding case is a ten-hour August outage beginning at 18:00, where 479.2 kWh is unserved and 89.4% of outage energy is supplied. These are perfect-foresight optimisation results, not reliability probabilities: they expose the design boundary but do not model equipment failures, forecast error or outage frequency. The complete case matrix is committed as [`resilience_envelope.csv`](results/reference/resilience_envelope.csv).
 
 ## Reproduce the analysis
 
@@ -148,6 +157,7 @@ See [legacy reconstruction notes](docs/legacy_reconstruction.md) for the traceab
 - The 34.5-tonne/day feedstock figure and 9,000 kWh/day load come from the legacy study.
 - The specific biogas yield is illustrative and must be replaced by a biochemical methane potential or pilot measurement before a real project decision.
 - Representative days are suitable for screening, not final electrical, civil, process or interconnection design.
+- The outage envelope assumes fixed capacities but perfect knowledge and optimal redispatch; it is a deterministic adequacy stress test, not a stochastic reliability forecast.
 - The emissions calculation is operational and does not claim a full lifecycle assessment or avoided-methane credit.
 - Taxes, financing structure, land, permits, EPC contingencies and detailed degradation are outside the reference scope.
 

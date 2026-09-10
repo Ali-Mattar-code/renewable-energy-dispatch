@@ -96,7 +96,35 @@
     "outage_load_kwh_weighted": 3300.3578151161755,
     "outage_load_served_fraction": 0.9999999999697002,
     "outage_unserved_kwh_weighted": 1e-07,
-    "representative_outage_hours": 6
+    "representative_outage_hours": 6,
+    "stress_envelope": {
+      "cases": 36,
+      "dispatch_assumption": "fixed capacities with perfect-foresight redispatch",
+      "durations_hours": [
+        2,
+        6,
+        10
+      ],
+      "fully_served_cases": 35,
+      "months": [
+        2,
+        8,
+        11
+      ],
+      "start_hours": [
+        0,
+        6,
+        12,
+        18
+      ],
+      "worst_case": {
+        "duration_hours": 10,
+        "month": 8,
+        "start_hour": 18,
+        "unserved_energy_kwh": 479.24064921229
+      },
+      "worst_case_served_fraction": 0.8937208536784503
+    }
   },
   "solver": {
     "method": "SciPy HiGHS linear programming",

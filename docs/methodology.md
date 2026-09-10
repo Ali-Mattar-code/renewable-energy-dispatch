@@ -47,6 +47,8 @@ This corrects the legacy assumption that methane mass equals 60% of wet manure m
 
 One regular August day is replaced by an outage day with six islanded evening hours. The resilient design includes an aggregate constraint requiring effectively zero unserved energy during that event. The event retains an annual weight of one day, so annual energy still reconciles to 365 days.
 
+After sizing, the installed capacities are frozen and tested over a 36-case resilience envelope spanning three representative months, four outage start times and three durations. Each case is optimally redispatched with perfect foresight and may shed load at the configured value of lost load. The output reports served energy rather than converting these deterministic cases into a probability of reliability.
+
 ## Objective
 
 The capacity-planning layer minimises equivalent annual cost:

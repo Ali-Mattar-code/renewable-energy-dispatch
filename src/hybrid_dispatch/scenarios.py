@@ -8,7 +8,7 @@ import pandas as pd
 
 from hybrid_dispatch.config import ProjectConfig, TechnologySet
 from hybrid_dispatch.economics import financial_model
-from hybrid_dispatch.optimizer import OptimisationResult, optimise_system
+from hybrid_dispatch.optimizer import CapacityPlan, OptimisationResult, optimise_system
 from hybrid_dispatch.profiles import build_representative_year, with_resilience_event
 
 
@@ -109,3 +109,49 @@ def resilience_test(result: OptimisationResult) -> dict[str, float]:
         "outage_unserved_kwh_weighted": outage_unserved,
         "outage_load_served_fraction": 1.0 - outage_unserved / max(outage_load, 1.0),
     }
+
+
+def resilience_envelope(
+    capacities: CapacityPlan,
+    config: ProjectConfig,
+    *,
+    months: tuple[int, ...] = (2, 8, 11),
+    start_hours: tuple[int, ...] = (0, 6, 12, 18),
+    durations: tuple[int, ...] = (2, 6, 10),
+) -> pd.DataFrame:
+    """Stress fixed capacities across outage timing, season and duration.
+
+    Every case allows perfect-foresight redispatch while holding the installed
+    asset sizes fixed. The result is a planning adequacy envelope, not an
+    operational reliability forecast.
+    """
+    if not months or not start_hours or not durations:
+        raise ValueError("months, start_hours and durations must not be empty")
+    rows: list[dict[str, float | int | bool]] = []
+    base_profile = build_representative_year(config)
+    for month in months:
+        for start_hour in start_hours:
+            for duration in durations:
+                profile = with_resilience_event(
+                    base_profile,
+                    month=month,
+                    start_hour=start_hour,
+                    hours=duration,
+                )
+                result = optimise_system(profile, config, fixed_capacities=capacities)
+                resilience = resilience_test(result)
+                unserved = resilience["outage_unserved_kwh_weighted"]
+                rows.append(
+                    {
+                        "month": month,
+                        "start_hour": start_hour,
+                        "duration_hours": duration,
+                        "outage_load_kwh": resilience["outage_load_kwh_weighted"],
+                        "unserved_energy_kwh": unserved,
+                        "served_fraction": resilience["outage_load_served_fraction"],
+                        "fully_served": unserved <= 1e-4,
+                    }
+                )
+    return pd.DataFrame(rows).sort_values(
+        ["duration_hours", "month", "start_hour"], ignore_index=True
+    )

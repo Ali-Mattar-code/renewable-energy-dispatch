@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from hybrid_dispatch.config import ProjectConfig
 from hybrid_dispatch.profiles import build_representative_year, with_resilience_event
@@ -20,3 +21,12 @@ def test_resilience_day_preserves_annual_weight() -> None:
     for hour in range(24):
         assert profile.loc[profile["hour"] == hour, "weight_days"].sum() == 365
     assert ((profile["stress_case"] == 1) & (profile["grid_available"] == 0)).sum() == 6
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [{"month": 0}, {"start_hour": 24}, {"hours": 0}, {"hours": 25}],
+)
+def test_resilience_event_rejects_invalid_windows(kwargs: dict[str, int]) -> None:
+    with pytest.raises(ValueError):
+        with_resilience_event(build_representative_year(ProjectConfig()), **kwargs)

@@ -102,6 +102,13 @@ def with_resilience_event(
     day with weight one is appended, so annual energy still represents 365 days.
     """
 
+    if not 1 <= month <= 12:
+        raise ValueError("month must be between 1 and 12")
+    if not 0 <= start_hour <= 23:
+        raise ValueError("start_hour must be between 0 and 23")
+    if not 1 <= hours <= 24:
+        raise ValueError("hours must be between 1 and 24")
+
     stressed = profile.copy()
     regular_mask = stressed["month"] == month
     if not regular_mask.any() or (stressed.loc[regular_mask, "weight_days"] < 1.0).any():

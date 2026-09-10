@@ -10,7 +10,12 @@ import pandas as pd
 
 from hybrid_dispatch.config import ProjectConfig
 from hybrid_dispatch.economics import financial_model
-from hybrid_dispatch.scenarios import compare_technologies, resilience_test, sensitivity_analysis
+from hybrid_dispatch.scenarios import (
+    compare_technologies,
+    resilience_envelope,
+    resilience_test,
+    sensitivity_analysis,
+)
 from hybrid_dispatch.serialization import write_json
 
 
@@ -179,6 +184,35 @@ def _cashflow_chart(cash_flow: pd.DataFrame, path: Path) -> None:
     _save(figure, path)
 
 
+def _resilience_envelope_chart(frame: pd.DataFrame, path: Path) -> None:
+    worst = (
+        frame.groupby(["duration_hours", "start_hour"], as_index=False)["served_fraction"]
+        .min()
+        .pivot(index="duration_hours", columns="start_hour", values="served_fraction")
+    )
+    values = worst.to_numpy() * 100.0
+    lower = min(95.0, float(np.floor(values.min())))
+    figure, axis = plt.subplots(figsize=(7.4, 4.5))
+    image = axis.imshow(values, cmap="RdYlGn", vmin=lower, vmax=100.0, aspect="auto")
+    for row in range(values.shape[0]):
+        for column in range(values.shape[1]):
+            axis.text(
+                column,
+                row,
+                f"{values[row, column]:.1f}%",
+                ha="center",
+                va="center",
+                fontweight="bold",
+            )
+    axis.set_xticks(range(len(worst.columns)), [f"{int(hour):02d}:00" for hour in worst.columns])
+    axis.set_yticks(range(len(worst.index)), [f"{int(hours)} h" for hours in worst.index])
+    axis.set(xlabel="Outage start", ylabel="Outage duration")
+    axis.set_title("Worst seasonal outage-load coverage", color=COLORS["navy"], fontweight="bold")
+    figure.colorbar(image, ax=axis, label="Load served (%)")
+    figure.tight_layout()
+    _save(figure, path)
+
+
 def run_reference(
     *,
     output_dir: str | Path = "results/reference",
@@ -194,11 +228,32 @@ def run_reference(
     financial, cash_flow = financial_model(full, config)
     sensitivity = sensitivity_analysis(config)
     resilience = resilience_test(full)
+    envelope = resilience_envelope(full.capacities, config)
+    worst_case = envelope.sort_values(
+        ["served_fraction", "duration_hours", "month", "start_hour"],
+        ascending=[True, False, True, True],
+    ).iloc[0]
+    resilience["stress_envelope"] = {
+        "cases": len(envelope),
+        "months": sorted(int(value) for value in envelope["month"].unique()),
+        "start_hours": sorted(int(value) for value in envelope["start_hour"].unique()),
+        "durations_hours": sorted(int(value) for value in envelope["duration_hours"].unique()),
+        "fully_served_cases": int(envelope["fully_served"].sum()),
+        "worst_case_served_fraction": float(worst_case["served_fraction"]),
+        "worst_case": {
+            "month": int(worst_case["month"]),
+            "start_hour": int(worst_case["start_hour"]),
+            "duration_hours": int(worst_case["duration_hours"]),
+            "unserved_energy_kwh": float(worst_case["unserved_energy_kwh"]),
+        },
+        "dispatch_assumption": "fixed capacities with perfect-foresight redispatch",
+    }
 
     comparison.to_csv(output / "scenario_comparison.csv", index=False)
     full.dispatch.to_csv(output / "representative_dispatch.csv", index=False)
     sensitivity.to_csv(output / "sensitivity.csv", index=False)
     cash_flow.to_csv(output / "cash_flow.csv", index=False)
+    envelope.to_csv(output / "resilience_envelope.csv", index=False)
 
     summary: dict[str, object] = {
         "evidence_scope": "illustrative feasibility benchmark using representative-day optimisation",
@@ -230,4 +285,5 @@ def run_reference(
     _scenario_chart(comparison, figures / "scenario_comparison.png")
     _sensitivity_chart(sensitivity, figures / "sensitivity.png")
     _cashflow_chart(cash_flow, figures / "cash_flow.png")
+    _resilience_envelope_chart(envelope, figures / "resilience_envelope.png")
     return summary
